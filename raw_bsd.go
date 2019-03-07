@@ -51,7 +51,7 @@ var (
 // package.
 type packetConn struct {
 	proto  uint16
-	ifi    *net.Interface
+	ifi    Interface
 	f      *os.File
 	fd     int
 	buflen int
@@ -63,7 +63,7 @@ type packetConn struct {
 
 // listenPacket creates a net.PacketConn which can be used to send and receive
 // data at the device driver level.
-func listenPacket(ifi *net.Interface, proto uint16, _ Config) (*packetConn, error) {
+func listenPacket(ifi Interface, proto uint16, _ Config) (*packetConn, error) {
 	// Config is, as of now, unused on BSD.
 	// TODO(mdlayher): consider porting NoTimeouts option to BSD if it pans out.
 
@@ -235,9 +235,9 @@ func (p *packetConn) Stats() (*Stats, error) {
 
 // configureBPF configures a BPF device with the specified file descriptor to
 // use the specified network and interface and protocol.
-func configureBPF(fd int, ifi *net.Interface, proto uint16) (int, error) {
+func configureBPF(fd int, ifi Interface, proto uint16) (int, error) {
 	// Use specified interface with BPF device
-	if err := syscall.SetBpfInterface(fd, ifi.Name); err != nil {
+	if err := syscall.SetBpfInterface(fd, ifi.Name()); err != nil {
 		return 0, err
 	}
 

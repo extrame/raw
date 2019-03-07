@@ -1,4 +1,4 @@
-// +build !darwin,!dragonfly,!freebsd,!linux,!netbsd,!openbsd
+// +build !darwin,!dragonfly,!freebsd,!linux,!netbsd,!openbsd,!windows
 
 package raw
 
@@ -18,7 +18,7 @@ var (
 type packetConn struct{}
 
 // listenPacket is not currently implemented on this platform.
-func listenPacket(ifi *net.Interface, proto uint16, cfg Config) (*packetConn, error) {
+func listenPacket(ifi Interface, proto uint16, cfg Config) (*packetConn, error) {
 	return nil, ErrNotImplemented
 }
 

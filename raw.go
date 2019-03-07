@@ -121,7 +121,7 @@ func (c *Conn) Stats() (*Stats, error) {
 // cfg specifies optional configuration which may be operating system-specific.
 // A nil Config is equivalent to the default configuration: send and receive
 // data at the network interface device driver level (usually raw Ethernet frames).
-func ListenPacket(ifi *net.Interface, proto uint16, cfg *Config) (*Conn, error) {
+func ListenPacket(ifi Interface, proto uint16, cfg *Config) (*Conn, error) {
 	// A nil config is an empty Config.
 	if cfg == nil {
 		cfg = &Config{}
