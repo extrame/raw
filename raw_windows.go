@@ -64,8 +64,6 @@ func listenPacket(ifi Interface, proto uint16, cfg Config) (*packetConn, error) 
 	if wifi, ok = ifi.(*interfaceWindwows); !ok {
 		return nil, errors.New("not corrent ifi type")
 	}
-
-	fmt.Println(fmt.Sprintf("ether proto 0x%x", proto))
 	if handle, err := pcap.OpenLive(ifi.Name(), 1600, true, pcap.BlockForever); err != nil {
 		return nil, errors.Wrap(err, "in open live")
 	} else if err := handle.SetBPFFilter(fmt.Sprintf("ether proto 0x%x", proto)); err != nil { // optional
