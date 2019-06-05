@@ -71,7 +71,7 @@ func listenPacket(ifi Interface, proto uint16, _ Config) (*packetConn, error) {
 	var err error
 
 	// Try to find an available BPF device
-	for i := 0; i <= 10; i++ {
+	for i := 0; i <= 20; i++ {
 		bpfPath := fmt.Sprintf("/dev/bpf%d", i)
 		f, err = os.OpenFile(bpfPath, os.O_RDWR, 0666)
 		if err == nil {
@@ -182,7 +182,7 @@ func (p *packetConn) Close() error {
 // LocalAddr returns the local network address.
 func (p *packetConn) LocalAddr() net.Addr {
 	return &Addr{
-		HardwareAddr: p.ifi.HardwareAddr,
+		HardwareAddr: p.ifi.HardwareAddr(),
 	}
 }
 
@@ -264,7 +264,7 @@ func configureBPF(fd int, ifi Interface, proto uint16) (int, error) {
 
 	// Build and apply base BPF filter which checks for correct EtherType
 	// on incoming packets
-	prog, err := bpf.Assemble(baseInterfaceFilter(proto, ifi.MTU))
+	prog, err := bpf.Assemble(baseInterfaceFilter(proto, ifi.MTU()))
 	if err != nil {
 		return 0, err
 	}

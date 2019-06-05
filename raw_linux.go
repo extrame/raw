@@ -22,7 +22,7 @@ var (
 // packetConn is the Linux-specific implementation of net.PacketConn for this
 // package.
 type packetConn struct {
-	ifi *net.Interface
+	ifi Interface
 	s   socket
 	pbe uint16
 
@@ -56,7 +56,7 @@ func htons(i uint16) uint16 {
 
 // listenPacket creates a net.PacketConn which can be used to send and receive
 // data at the device driver level.
-func listenPacket(ifi *net.Interface, proto uint16, cfg Config) (*packetConn, error) {
+func listenPacket(ifi Interface, proto uint16, cfg Config) (*packetConn, error) {
 	// Convert proto to big endian.
 	pbe := htons(proto)
 
@@ -104,14 +104,14 @@ func listenPacket(ifi *net.Interface, proto uint16, cfg Config) (*packetConn, er
 // interface, wrapped socket and big endian protocol number.
 //
 // It is the entry point for tests in this package.
-func newPacketConn(ifi *net.Interface, s socket, pbe uint16) (*packetConn, error) {
+func newPacketConn(ifi Interface, s socket, pbe uint16) (*packetConn, error) {
 	// Bind the packet socket to the interface specified by ifi
 	// packet(7):
 	//   Only the sll_protocol and the sll_ifindex address fields are used for
 	//   purposes of binding.
 	err := s.Bind(&unix.SockaddrLinklayer{
 		Protocol: pbe,
-		Ifindex:  ifi.Index,
+		Ifindex:  ifi.Index(),
 	})
 	if err != nil {
 		return nil, err
@@ -171,7 +171,7 @@ func (p *packetConn) WriteTo(b []byte, addr net.Addr) (int, error) {
 	//   be 0.
 	// In this case, sll_family is taken care of automatically by unix.
 	err := p.s.Sendto(b, 0, &unix.SockaddrLinklayer{
-		Ifindex:  p.ifi.Index,
+		Ifindex:  p.ifi.Index(),
 		Halen:    uint8(len(a.HardwareAddr)),
 		Addr:     baddr,
 		Protocol: p.pbe,
@@ -187,7 +187,7 @@ func (p *packetConn) Close() error {
 // LocalAddr returns the local network address.
 func (p *packetConn) LocalAddr() net.Addr {
 	return &Addr{
-		HardwareAddr: p.ifi.HardwareAddr,
+		HardwareAddr: p.ifi.HardwareAddr(),
 	}
 }
 
@@ -229,7 +229,7 @@ func (p *packetConn) SetBPF(filter []bpf.RawInstruction) error {
 // to receive traffic that is not addressed to the interface.
 func (p *packetConn) SetPromiscuous(b bool) error {
 	mreq := unix.PacketMreq{
-		Ifindex: int32(p.ifi.Index),
+		Ifindex: int32(p.ifi.Index()),
 		Type:    unix.PACKET_MR_PROMISC,
 	}
 

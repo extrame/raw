@@ -56,7 +56,10 @@ func (c *Conn) WriteTo(b []byte, addr net.Addr) (int, error) {
 
 // Close closes the connection.
 func (c *Conn) Close() error {
-	return c.p.Close()
+	if c != nil && c.p != nil {
+		return c.p.Close()
+	}
+	return nil
 }
 
 // LocalAddr returns the local network address.

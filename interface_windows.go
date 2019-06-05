@@ -39,7 +39,7 @@ func (a *addrWindows) String() string {
 	return a.addr.IP.String()
 }
 
-func (a *interfaceWindwows) HardwareAddr() []byte {
+func (a *interfaceWindwows) HardwareAddr() net.HardwareAddr {
 	return []byte{1, 2, 3, 4, 5, 6}
 }
 
